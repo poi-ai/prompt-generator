@@ -1,14 +1,14 @@
 ---
 name: quick-fix
-description: Use this skill whenever the user directly describes, in their own words (not quoting AI-generated feedback), something they personally noticed while using prompt-generator that they want changed or fixed - a short note like "the X question should default to Y" or "Z is confusing, reword it". Trigger even without an explicit command name; a short first-person observation about the tool's own behavior is enough. Unlike triage-feedback, skip the fix/no-fix sorting - the user has already decided this is worth fixing - and go straight to Issue creation, implementation, commit, and push.
+description: ユーザーがAIのフィードバックを介さず、このジェネレーターを実際に使っていて自分で気づいた「直したい点」を、自分の言葉で短く書いて渡してきたときに使う(例:「〇〇の質問のデフォルトを△△にしてほしい」「××の文言がわかりにくいので直したい」)。コマンド名を明示しなくても、このツール自体の挙動についての一人称の気づきが書かれていれば発動してよい。triage-feedbackと異なり、対応すべきか否かの仕分けは行わない(ユーザーが既に直すと決めているため)。そのままIssue作成・実装・commit・pushまで行う。
 ---
 
-# Turn a user note into a shipped fix
+# ユーザーの気づきをそのまま反映する
 
-The user has already used this generator, noticed something they want changed, and written a short note about it. Unlike AI-relayed feedback (see the `triage-feedback` skill), there is no batch of mixed-quality points to sort - the user has done that judgment call themselves by writing the note. Don't re-litigate whether it's worth fixing.
+ユーザーはすでにこのジェネレーターを使っていて、直したい点に気づき、それを短いメモとして書いている。AI経由のフィードバック(`triage-feedback` Skillを参照)と違い、玉石混交の指摘を仕分ける必要はない。その判断はユーザー自身が既に済ませているので、対応すべきかどうかを蒸し返さない。
 
-## Steps
+## 手順
 
-1. **Read the note and make sure you understand the concrete change.** If it's already specific enough to act on, don't stop to confirm - that just adds friction the user explicitly wanted to avoid. Only ask first if the note is genuinely ambiguous (e.g. it could reasonably mean two different changes, or names a question/file that doesn't obviously exist).
-2. **Follow `CLAUDE.md`'s workflow end to end**: create a GitHub Issue describing the change, create a `#<Issue番号>` branch, implement it, verify it actually works (monkeypatch `menu.select`/`menu.ask_text` in a throwaway script for interactive flows, or call the relevant function directly, and check the real output), commit, and push. If an Issue for this exact note already exists from earlier in the conversation, reuse it instead of creating a duplicate.
-3. **Do not merge.** Report that you pushed, and wait for the user to explicitly say to merge - same as every other change in this repo.
+1. **メモを読み、具体的にどう変えたいのかを理解する。** 内容が十分に具体的であれば、それ以上確認せずに着手する(ここで都度確認を挟むこと自体が、ユーザーが避けたかった手間になる)。着手前に確認するのは、内容が本当に曖昧で複数の解釈があり得る場合や、指している質問・ファイルが実在しない場合のみでよい。
+2. **`CLAUDE.md` の手順に従い、一気通貫で進める。** Issue作成 → `#<Issue番号>` ブランチ作成 → 実装 → 動作確認(対話フローは `menu.select`/`menu.ask_text` をモックした簡易スクリプトで、対象の関数を直接呼び出して実際の出力を確認する)→ commit → push。この会話の中で同じ内容のIssueが既にある場合は、新規作成せずそれを使う。
+3. **マージはしない。** pushしたら完了を報告し、マージするかどうかはこのリポジトリの他の変更と同様、ユーザーの明示的な指示を待つ。
