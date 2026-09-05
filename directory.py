@@ -127,9 +127,6 @@ def _ask_local_path():
 
 def _ask_remote():
     """リモート環境向け: 作業対象はセッション開始前に(デスクトップ版・VSCode版などで)
-    選択済みという前提のため、パスやリポジトリ名は質問せず、gitリポジトリかどうかのみ質問する
+    選択済みであり、gitリポジトリかどうかもその時点で判別可能なため、追加の質問はしない
     """
-    index = menu.select("対象はgitリポジトリですか?", ["はい", "いいえ"])
-    if index is None:
-        return wizard.BACK
-    return DirectoryInfo(_REMOTE_TARGET_LABEL, index == 0)
+    return DirectoryInfo(_REMOTE_TARGET_LABEL, True)
