@@ -14,8 +14,10 @@ _HISTORY_FILE = Path("history") / "directories.txt"
 _HISTORY_LIMIT = 10
 _OTHER_LABEL = "その他(自由入力)"
 
-_ENV_OPTIONS = ["ローカル環境(このPC上のディレクトリ)", "リモート環境(クラウド上のセッション等)"]
+_ENV_OPTIONS = ["ローカル環境", "リモート環境"]
 _ENV_LOCAL = 0
+
+_REMOTE_TARGET_LABEL = "事前に選択済みのリポジトリ"
 
 
 class DirectoryInfo(NamedTuple):
@@ -124,21 +126,10 @@ def _ask_local_path():
 
 
 def _ask_remote():
-    """リモート環境向け: 実在チェックは行わず、gitリポジトリかどうかを直接質問する
-
-    このPC上には存在しないパスが前提のため、履歴への保存も行わない。
+    """リモート環境向け: 作業対象はセッション開始前に(デスクトップ版・VSCode版などで)
+    選択済みという前提のため、パスやリポジトリ名は質問せず、gitリポジトリかどうかのみ質問する
     """
-
-    def ask_path():
-        value = menu.ask_text("対象ディレクトリのパスやリポジトリ名など、作業対象がわかる情報を入力してください: ")
-        return wizard.BACK if value is None else value
-
-    def ask_is_git_repo():
-        index = menu.select("対象はgitリポジトリですか?", ["はい", "いいえ"])
-        return wizard.BACK if index is None else index == 0
-
-    result = wizard.ask_sequence([ask_path, ask_is_git_repo])
-    if result is wizard.BACK:
+    index = menu.select("対象はgitリポジトリですか?", ["はい", "いいえ"])
+    if index is None:
         return wizard.BACK
-    path, is_git_repo = result
-    return DirectoryInfo(path, is_git_repo)
+    return DirectoryInfo(_REMOTE_TARGET_LABEL, index == 0)
