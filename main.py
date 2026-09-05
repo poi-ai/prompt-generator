@@ -26,6 +26,7 @@ MODE_PLAN = "plan"
 MODE_EXECUTE = "execute"
 
 OUTPUT_OPTIONS = ["ターミナルに表示", "mdファイルに出力", "両方"]
+FEEDBACK_OPTIONS = ["出力する", "出力しない"]
 
 
 def _genres_for_mode(mode_index: int) -> list[tuple[str, object]]:
@@ -69,6 +70,15 @@ def ask_output_destination() -> int:
         return index
 
 
+def ask_feedback_wanted() -> bool:
+    while True:
+        index = menu.select("作業完了後に投げるフィードバック依頼プロンプトも出力しますか?", FEEDBACK_OPTIONS)
+        if index is None:
+            print("これ以上前の質問には戻れません。選び直してください。")
+            continue
+        return index == 0
+
+
 def show_prompt(prompt: str) -> None:
     print("\n===== 生成されたプロンプト =====")
     print(prompt)
@@ -81,7 +91,7 @@ def show_feedback_prompt(feedback_prompt: str) -> None:
     print("========================================================\n")
 
 
-def save_prompt(prompt: str, feedback_prompt: str) -> None:
+def save_prompt(prompt: str, feedback_prompt: str | None) -> None:
     filename = input("保存するファイル名 (拡張子なし、Enterで既定値 'prompt'): ").strip()
     if not filename:
         filename = "prompt"
@@ -92,9 +102,10 @@ def save_prompt(prompt: str, feedback_prompt: str) -> None:
     path.write_text(prompt, encoding="utf-8")
     print(f"保存しました: {path}")
 
-    feedback_path = output_dir / f"{filename}-feedback.md"
-    feedback_path.write_text(feedback_prompt, encoding="utf-8")
-    print(f"保存しました: {feedback_path}")
+    if feedback_prompt is not None:
+        feedback_path = output_dir / f"{filename}-feedback.md"
+        feedback_path.write_text(feedback_prompt, encoding="utf-8")
+        print(f"保存しました: {feedback_path}")
 
 
 def main() -> None:
@@ -113,12 +124,13 @@ def main() -> None:
             continue  # モード選択・ジャンル選択に戻る
         break
 
-    feedback_prompt = feedback.build(prompt)
-
     destination = ask_output_destination()
+    feedback_prompt = feedback.build(prompt) if ask_feedback_wanted() else None
+
     if destination in (0, 2):
         show_prompt(prompt)
-        show_feedback_prompt(feedback_prompt)
+        if feedback_prompt is not None:
+            show_feedback_prompt(feedback_prompt)
     if destination in (1, 2):
         save_prompt(prompt, feedback_prompt)
 
