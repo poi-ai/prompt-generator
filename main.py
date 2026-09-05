@@ -21,7 +21,7 @@ EXECUTE_ONLY_GENRES = [
     ("Issue作成", issue.run),
 ]
 
-MODE_OPTIONS = ["計画立案(まず作業計画を立てさせる)", "直接実行(その場で作業を行わせる)"]
+MODE_OPTIONS = ["計画立案", "直接実行"]
 MODE_PLAN = "plan"
 MODE_EXECUTE = "execute"
 

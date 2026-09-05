@@ -207,12 +207,12 @@ def _ask_context(_answers):
 
 
 def _ask_keep_verification(_answers):
-    index = menu.select("動作確認で使ったコードを残しますか?", ["残す", "残さない"])
+    index = menu.select("動作確認で使ったコードを残しますか?", ["残さない", "残す"])
     return BACK if index is None else index
 
 
 def _ask_make_tests(_answers):
-    index = menu.select("テストコードを作成しますか?", ["する", "しない"])
+    index = menu.select("テストコードを作成しますか?", ["しない", "する"])
     return BACK if index is None else index
 
 
@@ -252,7 +252,7 @@ def run(mode: str):
     target = answers["target"]
     type_label, task_bullets = answers["type_and_details"]
     premise = _premise_block(mode, answers["output_format"], answers["constraints"], answers["context"])
-    quality = _quality_block(answers["keep_index"] == 0, answers["test_index"] == 0, answers["docs"])
+    quality = _quality_block(answers["keep_index"] == 1, answers["test_index"] == 1, answers["docs"])
 
     return _build_prompt(
         mode, target.path, type_label, task_bullets, premise, quality, answers["strategy"], answers["github_block"]
