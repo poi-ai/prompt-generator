@@ -6,6 +6,7 @@
 """
 
 import directory
+import github
 import menu
 import wizard
 from genres.coding import _ask_bugfix, _ask_modification, _ask_new_feature
@@ -33,6 +34,7 @@ def _premise_block(constraints: str, context: str) -> str:
         lines.append(f"- 参考情報: {context}")
     if not constraints and not context:
         lines.append("- 特になし。")
+    lines.extend(github.public_record_notice_lines())
     return "\n".join(lines)
 
 

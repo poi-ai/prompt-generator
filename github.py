@@ -28,6 +28,19 @@ _ISSUE_NONE = -1
 _ISSUE_NEW = 0
 
 
+def public_record_notice_lines() -> list[str]:
+    """Issue作成・Issueへのコメント記録・コミット・PR作成など、内容が公開リポジトリに
+    残る操作を行う場合に追加する注意事項を返す
+    """
+    return [
+        "- コミットメッセージ・PR本文・Issueコメントなど、リポジトリに残る記録に、"
+        "個人のアカウントに繋がるセッションURLを含めないこと。",
+        "- 依頼内容にファイルパスや添付ファイルの情報が含まれる場合、ユーザー名・端末名・"
+        "内部システム名など個人情報や攻撃のヒントになり得る情報はそのまま転記せず、"
+        "一般化した表現に置き換えて記載すること。",
+    ]
+
+
 def _ask_issue_number():
     while True:
         value = menu.ask_text(
@@ -99,10 +112,12 @@ def _ask_no_issue_rest():
     commit_push_index = answers["commit_push_index"]
     if commit_push_index == _COMMIT_PUSH_NEITHER:
         lines.append("- 作業完了後のコミット・プッシュは不要。")
-    elif commit_push_index == _COMMIT_PUSH_BOTH:
-        lines.append("- 作業完了後、変更をコミットしたうえでプッシュすること。")
     else:
-        lines.append("- 作業完了後、変更をコミットすること(リモートへのプッシュは不要)。")
+        if commit_push_index == _COMMIT_PUSH_BOTH:
+            lines.append("- 作業完了後、変更をコミットしたうえでプッシュすること。")
+        else:
+            lines.append("- 作業完了後、変更をコミットすること(リモートへのプッシュは不要)。")
+        lines.extend(public_record_notice_lines())
 
     return "\n".join(lines)
 
@@ -216,6 +231,9 @@ def _ask_rest_with_issue(directory_path: str, issue_number: int):
         else:
             lines.append("- 作業完了後、変更をコミットすること(リモートへのプッシュは不要)。")
 
+    if issue_number == _ISSUE_NEW or answers["record_index"] == 0 or commit_push_index != _COMMIT_PUSH_NEITHER:
+        lines.extend(public_record_notice_lines())
+
     return "\n".join(lines)
 
 
@@ -276,5 +294,8 @@ def ask_investigation(is_git_repo: bool, result_label: str = "調査結果"):
             )
         if index == 0:
             lines.append(f"- 作業完了後、{result_label}を Issue にコメントとして記録すること。")
+
+        if issue_number == _ISSUE_NEW or index == 0:
+            lines.extend(public_record_notice_lines())
 
         return "\n".join(lines)
